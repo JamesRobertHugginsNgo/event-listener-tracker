@@ -1,11 +1,11 @@
-import ListenerTracker from './listener-tracker.js';
+import EventListenerTracker from './event-listener-tracker.js';
 
 import assert from 'node:assert';
 import test, { describe } from 'node:test';
 
 describe('listener-tracker.test.js', () => {
 	test('add listener', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const listener = () => void 0;
 
 		const result = tracker.addListener('change', listener);
@@ -16,7 +16,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('add 2 listeners', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const listener1 = () => void 0;
 		const listener2 = () => void 0;
 
@@ -30,7 +30,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('add listener twice', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const listener = () => void 0;
 
 		tracker.addListener('change', listener);
@@ -41,7 +41,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('add listener as captured and non captured resulting in two listeners', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const listener = () => void 0;
 
 		tracker.addListener('change', listener);
@@ -58,7 +58,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('add "once" listener', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const listener = () => void 0;
 
 		const result = tracker.addListener('change', listener, { once: true });
@@ -69,7 +69,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('add "once" listener then resolve by calling resulting listener ending with no listener', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const listener = () => void 0;
 
 		const result = tracker.addListener('change', listener, { once: true });
@@ -80,7 +80,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('add listener then abort ending with no listener', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const abortController = new AbortController();
 		const listener = () => void 0;
 
@@ -91,7 +91,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('add listener after abort ending with no listener', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const abortController = new AbortController();
 		const listener = () => void 0;
 
@@ -103,7 +103,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('remove listener', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const listener = () => void 0;
 
 		tracker.addListener('change', listener);
@@ -114,7 +114,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('remove non existing listener ending with no error', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const listener = () => void 0;
 
 		const result = tracker.removeListener('change', listener);
@@ -124,7 +124,7 @@ describe('listener-tracker.test.js', () => {
 	});
 
 	test('remove one of two added listeners (captured and non captured)', () => {
-		const tracker = new ListenerTracker();
+		const tracker = new EventListenerTracker();
 		const listener = () => void 0;
 
 		tracker.addListener('change', listener);

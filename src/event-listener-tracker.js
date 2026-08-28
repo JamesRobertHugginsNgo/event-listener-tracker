@@ -4,7 +4,7 @@ function normalizeOptions(options) {
 		: { capture: options };
 }
 
-export default class ListenerTracker {
+export default class EventListenerTracker {
 	_map = new Map(); // hint: [type][listener][capture] = { listener, signal, signalListener }
 
 	addListener(type, listener, options) {

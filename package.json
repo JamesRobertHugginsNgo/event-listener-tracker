@@ -1,21 +1,21 @@
 {
-	"name": "listener-tracker",
+	"name": "event-listener-tracker",
 	"version": "1.0.0",
 	"description": "",
-	"main": "listener-tracker.js",
+	"main": "event-listener-tracker.js",
 	"scripts": {
 		"test": "node --test"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/JamesRobertHugginsNgo/listener-tracker.git"
+		"url": "git+https://github.com/JamesRobertHugginsNgo/event-listener-tracker.git"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"type": "module",
 	"bugs": {
-		"url": "https://github.com/JamesRobertHugginsNgo/listener-tracker/issues"
+		"url": "https://github.com/JamesRobertHugginsNgo/event-listener-tracker/issues"
 	},
-	"homepage": "https://github.com/JamesRobertHugginsNgo/listener-tracker#readme"
+	"homepage": "https://github.com/JamesRobertHugginsNgo/event-listener-tracker#readme"
 }
