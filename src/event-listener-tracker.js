@@ -5,9 +5,9 @@ function normalizeOptions(options) {
 }
 
 export default class EventListenerTracker {
-	_map = new Map(); // hint: [type][listener][capture] = { listener, signal, signalListener }
+	_map = new Map(); // [type][listener][capture] = { listener, signal, signalListener }
 
-	addListener(type, listener, options) {
+	set(type, listener, options) {
 		const {
 			capture = false,
 			once = false,
@@ -16,66 +16,70 @@ export default class EventListenerTracker {
 
 		const isAbortSignal = signal instanceof AbortSignal;
 		if (isAbortSignal && signal.aborted) {
-			return; // already aborted, don't even add
+			return; // aborted, don't set, return undefined
 		}
 
 		if (!this._map.has(type)) {
 			this._map.set(type, new Map());
 		}
-
 		const typeMap = this._map.get(type);
 		if (!typeMap.has(listener)) {
 			typeMap.set(listener, new Map());
 		}
-
 		const listenerMap = typeMap.get(listener);
 		if (!listenerMap.has(capture)) {
-			let signalListener;
-			if (isAbortSignal) {
-				signalListener = () => {
-					this.removeListener(type, listener, options);
-				};
-				signal.addEventListener('abort', signalListener, { once: true });
-			}
+			const captured = {};
 
 			if (once) {
-				const removeListener = () => {
-					this.removeListener(type, listener, options);
-				};
-				listenerMap.set(capture, {
-					listener: function (...args) {
-						removeListener();
-						return typeof listener === 'function'
-							? listener.call(this, ...args)
-							: listener.handleEvent(...args);
-					},
-					signal,
-					signalListener
-				});
+				if (typeof listener === 'function') {
+					const deleteListener = () => {
+						this.delete(type, listener, options);
+					};
+					captured.listener = (...args) => {
+						deleteListener();
+						return listener.call(this, ...args);
+					}
+				} else {
+					captured.listener = (...args) => {
+						this.delete(type, listener, options);
+						return listener.handleEvent(...args);
+					};
+				}
 			} else {
-				listenerMap.set(capture, { listener, signal, signalListener });
+				captured.listener = listener;
 			}
+
+			if (isAbortSignal) {
+				captured.signal = signal;
+				captured.signalListener = () => {
+					this.delete(type, listener, options);
+				};
+				signal.addEventListener('abort', captured.signalListener, { once: true });
+			}
+
+			listenerMap.set(capture, captured);
 		}
 
-		return listenerMap.get(capture).listener;
+		const { listener: result } = listenerMap.get(capture);
+		return result;
 	}
 
-	removeListener(type, listener, options) {
+	delete(type, listener, options) {
 		const { capture = false } = normalizeOptions(options);
 
-		let mappedListener;
+		let result;
 		if (this._map.has(type)) {
 			const typeMap = this._map.get(type);
 			if (typeMap.has(listener)) {
 				const listenerMap = typeMap.get(listener);
 				if (listenerMap.has(capture)) {
 					const {
-						listener: capturedListener,
+						listener: tempListener,
 						signal,
 						signalListener
 					} = listenerMap.get(capture);
 
-					mappedListener = capturedListener;
+					result = tempListener;
 
 					if (signal instanceof AbortSignal) {
 						signal.removeEventListener('abort', signalListener, { once: true });
@@ -92,10 +96,29 @@ export default class EventListenerTracker {
 			}
 		}
 
-		return mappedListener;
+		return result;
 	}
 
-	hasType(type) {
-		return this._map.has(type);
+	has(type, listener, options) {
+		if (!this._map.has(type)) {
+			return false;
+		}
+
+		if (listener === undefined) {
+			return true;
+		}
+
+		const typeMap = this._map.get(type);
+		if (!typeMap.has(listener)) {
+			return false;
+		}
+
+		if (options === undefined) {
+			return true;
+		}
+
+		const listenerMap = typeMap.get(listener);
+		const { capture = false } = normalizeOptions(options);
+		return listenerMap.has(capture);
 	}
 }
