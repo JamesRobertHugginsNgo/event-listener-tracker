@@ -1,7 +1,9 @@
 function normalizeOptions(options) {
-	return options !== null && typeof options === 'object'
-		? options
-		: { capture: options };
+	return options === null
+		? {}
+		: typeof options === 'object'
+			? options
+			: { capture: options };
 }
 
 export default class EventListenerTracker {
@@ -35,7 +37,7 @@ export default class EventListenerTracker {
 					const deleteListener = () => {
 						this.delete(type, listener, options);
 					};
-					captured.listener = (...args) => {
+					captured.listener = function (...args) {
 						deleteListener();
 						return listener.call(this, ...args);
 					}
@@ -82,7 +84,7 @@ export default class EventListenerTracker {
 					result = tempListener;
 
 					if (signal instanceof AbortSignal) {
-						signal.removeEventListener('abort', signalListener, { once: true });
+						signal.removeEventListener('abort', signalListener);
 					}
 
 					listenerMap.delete(capture);
@@ -104,21 +106,19 @@ export default class EventListenerTracker {
 			return false;
 		}
 
-		if (listener === undefined) {
-			return true;
+		if (listener !== undefined) {
+			const typeMap = this._map.get(type);
+			if (!typeMap.has(listener)) {
+				return false;
+			}
+
+			if (options !== undefined) {
+				const listenerMap = typeMap.get(listener);
+				const { capture = false } = normalizeOptions(options);
+				return listenerMap.has(capture);
+			}
 		}
 
-		const typeMap = this._map.get(type);
-		if (!typeMap.has(listener)) {
-			return false;
-		}
-
-		if (options === undefined) {
-			return true;
-		}
-
-		const listenerMap = typeMap.get(listener);
-		const { capture = false } = normalizeOptions(options);
-		return listenerMap.has(capture);
+		return true;
 	}
 }
