@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- `addEventListener` and `removeEventListener` convenience methods as this turns out to be unusable
+
 ## [1.1.0] - 2026-09-05
 
 ### Added

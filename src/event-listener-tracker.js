@@ -121,14 +121,4 @@ export default class EventListenerTracker {
 
 		return true;
 	}
-
-	addEventListener(eventTarget, type, listener, options) {
-		const capturedListener = this.set(type, listener, options);
-		eventTarget.addEventListener(type, capturedListener ?? listener, options);
-	}
-
-	removeEventListener(eventTarget, type, listener, options) {
-		const capturedListener = this.delete(type, listener, options);
-		eventTarget.removeEventListener(type, capturedListener ?? listener, options);
-	}
 }
