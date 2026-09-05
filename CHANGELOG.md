@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-05
+
 ### Removed
 
 - `addEventListener` and `removeEventListener` convenience methods as this turns out to be unusable
